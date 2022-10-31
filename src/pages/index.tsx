@@ -12,11 +12,13 @@ export default function Home() {
         <section className={styles.callToAction}>
           <h1>Uma Ferramenta para seu dia a dia escreva, planeje e organize-se...</h1>
           <p><span>100% Gratuita</span> e online</p>
+        
+          <div className={styles.donaters}>
+            <img src="https://gitlab.com/uploads/-/system/user/avatar/4514828/avatar.png?width=400" alt="Colaboradores" />
+            <img src="https://github.com/adelmomenezes123.png" alt="Colaboradores" />
+          </div>
         </section>
-
-        <div className={styles.donaters}>
-          <img src="https://github.com/adelmomenezes123.png" alt="Colaboradores" />
-        </div>
+        
     </main>
     </>
   )

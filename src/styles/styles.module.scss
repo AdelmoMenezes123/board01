@@ -7,7 +7,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  // flex-direction: column;
+  height: calc(100vh - 13vh);
 
   img{
     margin-top: 2rem;
@@ -57,5 +58,21 @@
 
   img:hover{
     transform: scale(1.2);
+  }
+
+  h5{
+    margin: 1rem;
+  }
+}
+
+@media(max-width: 1000px){
+  .contentContainer{
+    flex-direction: column;
+  }
+}
+
+@media(max-width: 700px) {
+  .contentContainer {
+    align-items: normal;
   }
 }
