@@ -1,4 +1,8 @@
 import Head from 'next/head';
+import { GetServerSideProps } from 'next';
+import { getSession } from 'next-auth/client';
+
+
 import styles from './styles.module.scss'
 import { FiPlus, FiCalendar, FiEdit2, FiTrash, FiClock } from 'react-icons/fi'
 import { SupportButton } from '../../components/SupportButton';
@@ -56,4 +60,28 @@ export default function Board(){
       <SupportButton/>
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const session = await getSession({ req });
+console.log(session)
+  if(!session?.id){
+    //Se o user nao tiver logado vamos redirecionar.
+    return{
+      redirect:{
+        destination: '/',
+        permanent: false
+      }
+    }
+  }
+
+
+  console.log(session.user);
+
+  return{
+    props:{
+
+    }
+  }
+
 }
