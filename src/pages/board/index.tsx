@@ -75,9 +75,6 @@ console.log(session)
     }
   }
 
-
-  console.log(session.user);
-
   return{
     props:{
 
