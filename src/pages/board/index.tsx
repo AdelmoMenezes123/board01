@@ -1,14 +1,16 @@
+import { useState, FormEvent } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/client';
+import  Link  from 'next/link';
 
-import { useState, FormEvent } from 'react';
 
 import styles from './styles.module.scss'
 import { FiPlus, FiCalendar, FiEdit2, FiTrash, FiClock } from 'react-icons/fi'
 import { SupportButton } from '../../components/SupportButton';
 
 import firebase from '../../services/firebaseConnection';
+import { format } from 'date-fns';
 
 interface BoardProps{
   user:{
@@ -19,6 +21,7 @@ interface BoardProps{
 
 export default function Board({ user }: BoardProps) {
    const [input, setInput] = useState('');
+   const [taskList, setTaskList] = useState([]);
 
   async function handleAddTask(e: FormEvent){
     e.preventDefault();
@@ -37,6 +40,17 @@ export default function Board({ user }: BoardProps) {
     })
     .then((doc)=>{
       console.log('CADASTRADO COM SUCESSO!')
+      let data = {
+        id: doc.id,
+        created: new Date(),
+        createdFormated: format(new Date(), 'dd MMMMM yyyy'),
+        tarefa: input,
+        userId: user.id,
+        nome:user.nome
+      }
+
+      setTaskList([...taskList, data])
+      setInput('');
     })
     .catch((err)=>{
       console.log('ERRO AO CADASTRAR: ', err)
@@ -63,26 +77,31 @@ export default function Board({ user }: BoardProps) {
         <h1>Você tem 2 tarefas!</h1>
       
         <section>
-          <article className={styles.taskList}>
-            <p>Aprender criar projetos usando Next JS e aplicando firebase como back.</p>
-            <div className={styles.actions}>
-              <div>
+
+          {taskList.map(task => (
+            <article key={task.id} className={styles.taskList}>
+              <Link href={ `/board/${task.id}` }>
+                <p>{ task.tarefa }</p>
+              </Link>
+              <div className={styles.actions}>
                 <div>
-                  <FiCalendar size={20} color="#FFB800"/>
-                  <time>17 Julho 2021</time>
+                  <div>
+                    <FiCalendar size={20} color="#FFB800"/>
+                      <time>{ task.createdFormated }</time>
+                  </div>
+                  <button>
+                    <FiEdit2 size={20} color="#FFF" />
+                    <span>Editar</span>
+                  </button>
                 </div>
+
                 <button>
-                  <FiEdit2 size={20} color="#FFF" />
-                  <span>Editar</span>
+                  <FiTrash size={20} color="#FF3636" />
+                  <span>Excluir</span>
                 </button>
               </div>
-
-              <button>
-                <FiTrash size={20} color="#FF3636" />
-                <span>Excluir</span>
-              </button>
-            </div>
-          </article>
+            </article>
+          ))}
         </section>
       </main>
 
