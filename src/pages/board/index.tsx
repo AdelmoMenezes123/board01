@@ -12,16 +12,26 @@ import { SupportButton } from '../../components/SupportButton';
 import firebase from '../../services/firebaseConnection';
 import { format } from 'date-fns';
 
+interface TaskList{
+  id: string,
+  created: string | Date,
+  createdFormated?: string,
+  tarefa: string,
+  userId: string,
+  nome: string
+}
+
 interface BoardProps{
   user:{
     id: string;
     nome: string;
-  }
+  },
+  data: string
 }
 
-export default function Board({ user }: BoardProps) {
+export default function Board({ user, data }: BoardProps) {
    const [input, setInput] = useState('');
-   const [taskList, setTaskList] = useState([]);
+   const [taskList, setTaskList] = useState<TaskList[]>(JSON.parse(data));
 
   async function handleAddTask(e: FormEvent){
     e.preventDefault();
@@ -43,7 +53,7 @@ export default function Board({ user }: BoardProps) {
       let data = {
         id: doc.id,
         created: new Date(),
-        createdFormated: format(new Date(), 'dd MMMMM yyyy'),
+        createdFormated: format(new Date(), 'dd MMMM yyyy'),
         tarefa: input,
         userId: user.id,
         nome:user.nome
@@ -74,10 +84,9 @@ export default function Board({ user }: BoardProps) {
           </button>
         </form>
 
-        <h1>Você tem 2 tarefas!</h1>
+        <h1>Você tem {taskList.length} { taskList.length === 1 ? 'tarefa!' : 'tarefas!'}</h1>
       
         <section>
-
           {taskList.map(task => (
             <article key={task.id} className={styles.taskList}>
               <Link href={ `/board/${task.id}` }>
@@ -134,6 +143,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     }
   }
 
+  const tasks = await firebase.firestore().collection('tarefas')
+    .where('userId', '==', session?.id)
+    .orderBy('created', 'asc').get();
+  const data = JSON.stringify(tasks.docs.map(u => {
+    return {
+      createdFormated: format(u.data().created.toDate(), 'dd MMMM yyyy'),    
+      ...u.data()
+    }
+  }))
+
   const user = {
     nome: session?.user.name,
     id: session?.id
@@ -142,7 +161,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   return{
     props:{
-      user
+      user,
+      data
     }
   }
 
